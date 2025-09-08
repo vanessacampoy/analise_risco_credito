@@ -36,10 +36,15 @@ O projeto foi conduzido em etapas bem definidas, que combinam técnicas de engen
 ## Estrutura do Repositório
 
 - `sql/` → Scripts de ETL, modelagem e score  
-- `dashboard/` → Prints e link do painel interativo  
-- `documentacao/` → PDFs com documentação técnica e análise de risco  
-- `apresentacao/` → Slides com resumo executivo e recomendações  
+- `dashboard/` → Prints do painel interativo  
+
+### Entregáveis Finais
+
+* **[Clique aqui para ver o Dashboard Interativo no Looker Studio](https://lookerstudio.google.com/reporting/42a5e84c-d7cb-42cf-9cba-6fb903fd1f8e)**
+
+* **[Clique aqui para ver a Apresentação Executiva](https://docs.google.com/presentation/d/1rdD61zwfBs6bMZKtprYMuiPibU-X4Itjh6LFMJtr_hQ/edit?usp=sharing)**
 
 ---
 
 Este projeto representa não só uma solução técnica, mas uma forma de pensar dados como ferramenta estratégica. Se quiser ver mais detalhes ou discutir como aplicar algo parecido em outro contexto, estou aberta a conversas.
+
