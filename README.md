@@ -1,2 +1,5 @@
-# analise_risco_credito
-Este projeto substitui a análise de crédito manual e demorada do Banco Caja por uma solução baseada em dados. A partir do histórico de 36.000 clientes, foi desenvolvido um score de risco e um dashboard interativo para acelerar e fundamentar as aprovações de crédito, permitindo uma gestão de risco mais ágil.
+Neste projeto, apliquei e aprofundei meus conhecimentos em Análise de Dados, SQL e Business Intelligence para resolver um desafio real de negócio. O trabalho envolveu a criação de um score de risco de crédito e um dashboard interativo para o Banco Caja, uma instituição fictícia que precisava modernizar seu processo de aprovação de crédito.
+
+A solução foi desenvolvida inteiramente em SQL no Google BigQuery e visualizada em um dashboard no Looker Studio. Foi utilizada a técnica de Análise de Risco Relativo para construir um scorecard prático, que identifica os principais fatores de risco da carteira de clientes. O dashboard permite que a equipe de crédito simule diferentes políticas de risco de forma interativa: basta escolher um "ponto de corte" e o sistema recalcula o impacto na acurácia, precisão e na captura de inadimplentes.
+
+O objetivo final é substituir o processo de análise manual, que era lento e subjetivo, por uma ferramenta que fornece clareza e agilidade. A solução apoia os analistas e gestores do banco a aprovarem créditos de forma mais segura e eficiente, baseando suas regras de negócio em dados concretos e cenários simulados.
