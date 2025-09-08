@@ -1,64 +1,45 @@
-# Ficha Técnica do Projeto: Análise de Risco de Crédito – Banco Caja
+# Projeto: Análise de Risco de Crédito – Banco Caja
 
-**Desenvolvido por:** Vanessa Campoy Costa
-**Data:** Setembro de 2025
+**Autora:** Vanessa Campoy Costa  
+**Data:** Setembro de 2025  
+
+## Visão Geral
+
+Este projeto aborda um desafio comum no setor financeiro, usando o Banco Caja como um caso de estudo. O problema central era o aumento no volume de solicitações de crédito, que sobrecarregava a equipe de análise de crédito. A lentidão do processo e o risco de inadimplência exigiam uma solução mais ágil, escalável e baseada em dados.
+
+A proposta foi desenvolver um modelo de análise de risco que substituísse o processo manual por uma abordagem automatizada, capaz de classificar clientes, apoiar decisões de crédito e tornar as políticas internas mais claras e estratégicas.
+
+## Etapas do Projeto
+
+O projeto foi conduzido em etapas bem definidas, que combinam técnicas de engenharia de dados, análise exploratória e visualização:
+
+1. **Entendimento do Problema e Estruturação da Solução**  
+   Mapeei os principais gargalos do processo atual e defini os objetivos da solução: agilidade, consistência e suporte à decisão.
+
+2. **ETL e Preparação dos Dados**  
+   Nesta etapa, realizei o processo de ETL completo para garantir a qualidade dos dados. Extraí as informações das 4 tabelas de origem e as carreguei no BigQuery. A fase de Transformação envolveu a limpeza da base, com o tratamento de valores nulos e duplicados, substituição de valores divergentes, além da padronização dos campos para garantir a consistência das informações.
+
+3. **Modelagem de Dados e e Criação de Variáveis**  
+   Com os dados limpos, iniciei a modelagem para estruturar a base de análise. Realizei uma análise de correlação para selecionar as variáveis de maior impacto no risco de inadimplência. Em seguida, criei novas variáveis para segmentar os clientes e enriquecer a análise. O resultado desta etapa foi a criação de **`views` segmentadas**, cada uma com um propósito analítico:
+* **Views de Preparação:** Para consolidar e enriquecer os dados em um nível de cliente.
+* **Views de Análise:** Para agregar os resultados e avaliar a performance do score de risco, servindo como os modelos de dados finais para o dashboard.
+
+4. **Análise Exploratória e Identificação de Padrões**  
+   Realizei a Análise Exploratória diretamente no BigQuery, utilizando consultas SQL para calcular estatísticas descritivas e investigar a distribuição das variáveis. O objetivo desta etapa foi entender o perfil geral dos clientes, a qualidade dos dados e identificar os primeiros padrões e outliers.
+
+5. **Construção do Score de Risco**  
+   Para validar a eficácia do score, testei múltiplos pontos de corte (de 2 a 6) e avaliei a performance de cada cenário com uma matriz de confusão e as métricas de Acurácia, Precisão, Recall e F1-Score.
+
+6. **Dashboard Interativo e Recomendação de Negócio**  
+   Para apresentar os resultados da análise e as conclusões do modelo, criei um dashboard interativo no Looker Studio. A ferramenta foi utilizada para visualizar os dados das views finais, permitindo a criação de gráficos, tabelas e filtros interativos para a exploração dos diferentes cenários de risco pela equipe do banco.
+
+## Estrutura do Repositório
+
+- `sql/` → Scripts de ETL, modelagem e score  
+- `dashboard/` → Prints e link do painel interativo  
+- `documentacao/` → PDFs com documentação técnica e análise de risco  
+- `apresentacao/` → Slides com resumo executivo e recomendações  
 
 ---
 
-## 1. Resumo do Projeto
-
-#### 1.1. Contexto de Negócio
-O Banco Caja enfrentava um desafio operacional significativo: um aumento no volume de solicitações de crédito sobrecarregou a equipe, que realizava as análises de forma manual. Esse processo lento e a crescente preocupação com a inadimplência exigiam uma solução que trouxesse mais agilidade e segurança para o banco.
-
-#### 1.2. Meu Objetivo
-Meu objetivo com este projeto foi substituir o processo manual por uma solução baseada em dados. Para isso, propus a criação de um score de risco e um dashboard interativo para classificar clientes, automatizar aprovações de baixo risco e permitir que a equipe de crédito definisse suas políticas de forma mais clara e informada.
-
-#### 1.3. Ferramentas Utilizadas
-* **Banco de Dados:** Google BigQuery
-* **Linguagem:** SQL
-* **Visualização de Dados:** Looker Studio
-
----
-
-## 2. Dicionário de Dados
-Para este projeto, utilizei 4 tabelas principais que continham os dados de 36.000 clientes do Banco Caja:
-
-| Tabela Original | Meu Nome | Descrição |
-| :--- | :--- | :--- |
-| `user_info` | `t_informacoes_clientes` | Dados demográficos dos clientes (idade, salário, dependentes). |
-| `default` | `t_inadimplencia_clientes` | `flag_inadimplencia`, indicando se um cliente já foi inadplente. |
-| `loans_detail` | `t_detalhes_emprestimos`| Comportamento financeiro (índice de endividamento, histórico de atrasos). |
-| `loans_outstanding`| `t_emprestimos_contratados`| Detalhes de cada contrato de empréstimo, como o tipo. |
-
----
-
-## 3. Metodologia da Análise
-Conduzi a análise seguindo um processo estruturado, que descrevo nos passos abaixo:
-
-**1. Carga e Estruturação Inicial dos Dados**
-Iniciei o projeto importando as 4 tabelas de origem para o Google BigQuery. Para facilitar a análise e a clareza do projeto, renomeei as tabelas para nomes em português.
-
-**2. Tratamento de Valores Nulos**
-Realizei uma verificação de dados nulos em todas as tabelas. A análise apontou valores ausentes nas colunas `numero_dependentes` e `salario_mes_anterior`. Decidi substituir os nulos de `numero_dependentes` por 0, e manter os de `salario_mes_anterior` como nulos para uma categorização posterior como "Desconhecido".
-
-**3. Verificação de Registros Duplicados**
-Verifiquei todas as tabelas em busca de registros duplicados em chaves primárias (como `id_usuario` e `id_emprestimo`) e confirmei que não havia nenhuma duplicata.
-
-**4. Análise de Correlação e Seleção de Variáveis**
-Para evitar redundância de informações no modelo, realizei uma análise de correlação (`CORR()`) entre as variáveis de dias de atraso. A variável `mais_90_dias_atraso` foi a selecionada para o modelo, pois apresentou a maior correlação com a inadimplência (0.307).
-
-**5. Análise e Tratamento de Outliers e Inconsistências**
-Utilizei o Looker Studio e o Excel para fazer uma análise exploratória e entender a distribuição de variáveis como `idade` e `salario_mes_anterior`, o que me permitiu identificar outliers. Também padronizei as colunas de texto, como `tipo_emprestimo`, para garantir a consistência dos dados, agrupando valores como "other" e "others".
-
-**6. Engenharia de Features e Unificação da Base**
-Criei novas colunas (`features`) para segmentar os clientes, como `faixa_etaria` e `faixa_salario`. Ao final desta etapa, unifiquei todas as tabelas tratadas e as novas features em uma `view` base no BigQuery, com um registro único por cliente, pronta para a modelagem.
-
-**7. Construção do Score de Risco**
-Com base nos perfis de risco que identifiquei na Análise de Risco Relativo, construí um scorecard para gerar o `score_de_risco` de cada cliente. A lógica que utilizei para pontuar o risco foi:
-```sql
-(
-  CASE WHEN faixa_etaria = '18-29' THEN 2 ELSE 0 END +
-  CASE WHEN faixa_etaria = '30-44' THEN 1 ELSE 0 END +
-  CASE WHEN indice_endividamento > 0.8 THEN 2 ELSE 0 END +
-  CASE WHEN numero_dependentes >= 3 THEN 1 ELSE 0 END
-) AS score_de_risco
+Este projeto representa não só uma solução técnica, mas uma forma de pensar dados como ferramenta estratégica. Se quiser ver mais detalhes ou discutir como aplicar algo parecido em outro contexto, estou aberta a conversas.
