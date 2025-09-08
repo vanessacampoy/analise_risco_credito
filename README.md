@@ -1,4 +1,4 @@
-Neste projeto, apliquei e aprofundei meus conhecimentos em Análise de Dados, SQL e Business Intelligence para resolver um desafio real de negócio. O trabalho envolveu a criação de um score de risco de crédito e um dashboard interativo para o Banco Caja, uma instituição fictícia que precisava modernizar seu processo de aprovação de crédito.
+Neste projeto, apliquei meus conhecimentos em Análise de Dados, SQL e Business Intelligence para resolver um desafio real de negócio. O trabalho envolveu a criação de um score de risco de crédito e um dashboard interativo para o Banco Caja, uma instituição fictícia que precisava modernizar seu processo de aprovação de crédito.
 
 A solução foi desenvolvida inteiramente em SQL no Google BigQuery e visualizada em um dashboard no Looker Studio. Foi utilizada a técnica de Análise de Risco Relativo para construir um scorecard prático, que identifica os principais fatores de risco da carteira de clientes. O dashboard permite que a equipe de crédito simule diferentes políticas de risco de forma interativa: basta escolher um "ponto de corte" e o sistema recalcula o impacto na acurácia, precisão e na captura de inadimplentes.
 
