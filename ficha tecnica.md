@@ -1,42 +1,157 @@
-# Projeto: Análise de Risco de Crédito – Banco Caja
+# Ficha Técnica – Projeto: Análise de Risco Relativo | Banco Super Caja
 
 **Autora:** Vanessa Campoy Costa  
 **Data:** Setembro de 2025  
 
 ## Visão Geral
 
-Este projeto aborda um desafio comum no setor financeiro, usando o Banco Caja como um caso de estudo. O problema central era o aumento no volume de solicitações de crédito, que sobrecarregava a equipe de análise de crédito. A lentidão do processo e o risco de inadimplência exigiam uma solução mais ágil, escalável e baseada em dados.
+Este documento registra os detalhes técnicos do projeto de análise de risco de crédito do **Banco Super Caja**. O objetivo foi substituir o processo manual de avaliação de crédito por uma abordagem automatizada, baseada em dados e métricas de risco relativo.
 
-A proposta foi desenvolver um modelo de análise de risco que substituísse o processo manual por uma abordagem automatizada, capaz de classificar clientes, apoiar decisões de crédito e tornar as políticas internas mais claras e estratégicas.
+Ferramentas utilizadas:
 
-## Etapas do Projeto
+* **Google BigQuery** – manipulação e modelagem de dados (SQL)
+* **Looker Studio** – visualização e dashboard
+* **Google Apresentações** – apresentação executiva
+* (Opcional) **Google Colab** – regressão logística em Python
 
-O projeto foi conduzido em etapas bem definidas, que combinam técnicas de engenharia de dados, análise exploratória e visualização:
+---
 
-1. **Entendimento do Problema e Estruturação da Solução**  
-   Mapeei os principais gargalos do processo atual e defini os objetivos da solução: agilidade, consistência e suporte à decisão.
+## 2. Estrutura de Dados
 
-2. **ETL e Preparação dos Dados**  
-   Nesta etapa, realizei o processo de ETL completo para garantir a qualidade dos dados. Extraí as informações das 4 tabelas de origem e as carreguei no BigQuery. A fase de Transformação envolveu a limpeza da base, com o tratamento de valores nulos e duplicados, substituição de valores divergentes, além da padronização dos campos para garantir a consistência das informações.
+**Tabelas originais:**
 
-3. **Modelagem de Dados e e Criação de Variáveis**  
-   Com os dados limpos, iniciei a modelagem para estruturar a base de análise. Realizei uma análise de correlação para selecionar as variáveis de maior impacto no risco de inadimplência. Em seguida, criei novas variáveis para segmentar os clientes e enriquecer a análise. O resultado desta etapa foi a criação de **`views` segmentadas**, cada uma com um propósito analítico:
-* **Views de Preparação:** Para consolidar e enriquecer os dados em um nível de cliente.
-* **Views de Análise:** Para agregar os resultados e avaliar a performance do score de risco, servindo como os modelos de dados finais para o dashboard.
+* `informacoes_clientes` – idade, salário, número de dependentes
+* `emprestimos_contratados` – contratos ativos, tipo de empréstimo
+* `detalhes_emprestimos` – histórico de pagamentos, índice de endividamento
+* `inadimplencia_clientes` – classificação inadimplente
 
-4. **Análise Exploratória e Identificação de Padrões**  
-   Realizei a Análise Exploratória diretamente no BigQuery, utilizando consultas SQL para calcular estatísticas descritivas e investigar a distribuição das variáveis. O objetivo desta etapa foi entender o perfil geral dos clientes, a qualidade dos dados e identificar os primeiros padrões e outliers.
+**Views finais consolidadas:**
 
-5. **Construção do Score de Risco**  
-   Para validar a eficácia do score, testei múltiplos pontos de corte (de 2 a 6) e avaliei a performance de cada cenário com uma matriz de confusão e as métricas de Acurácia, Precisão, Recall e F1-Score.
+* **`v_unica`** – base unificada de clientes, já tratada e com variáveis derivadas.
+* **`v_analise_cortes`** – cálculo dos scores por cliente, segmentados em diferentes pontos de corte.
+* **`v_score_validacao`** – resultados das métricas de performance (acurácia, precisão, recall, F1) e matriz de confusão.
 
-6. **Dashboard Interativo e Recomendação de Negócio**  
-   Para apresentar os resultados da análise e as conclusões do modelo, criei um dashboard interativo no Looker Studio. A ferramenta foi utilizada para visualizar os dados das views finais, permitindo a criação de gráficos, tabelas e filtros interativos para a exploração dos diferentes cenários de risco pela equipe do banco.
+---
 
-## Estrutura do Repositório
+## 3. Preparação e Limpeza de Dados
 
-- `sql/` → Scripts de ETL, modelagem e score  
-- `dashboard/` → Prints do painel interativo  
+### 3.1 Tratamento de Nulos
+
+* **salario\_mes\_anterior**: mantido como NULL → categorizado como *“desconhecido”*.
+* **numero\_dependentes**: substituído NULL → 0.
+
+### 3.2 Duplicados
+
+Não foram encontrados registros duplicados nas tabelas.
+
+### 3.3 Inconsistências Categóricas
+
+* Padronização de texto (`lower(trim())`).
+
+### 3.4 Outliers
+
+* **Idade**: valores > 100 anos mantidos (possíveis clientes válidos).
+* **Dependentes**: outliers (até 13) agrupados em categorias.
+* **Salário**: alta dispersão (> R\$ 1 milhão), analisado por faixas.
+
+### 3.5 Feature Engineering
+
+Variáveis criadas:
+
+* Faixas de **salário**, **idade**, **endividamento** e **dependentes**
+* **Renda per capita**: salário / (dependentes + 1)
+
+---
+
+## 4. Análise Exploratória (EDA)
+
+* Base de **36 mil clientes**.
+* **Inadimplência geral: 1,9%**.
+* **Média salarial: R\$ 6.668,57** (mediana R\$ 5.400).
+* **Média de idade: 52 anos**.
+
+**Padrões encontrados (contexto de inadimplência por segmentos):**
+
+* Jovens (18–29) → inadimplência 3,5% (≈6x idosos).
+* Crédito imobiliário → 3,4% (2x outros).
+* Endividamento alto (81–100% renda) → 3,1% inadimplência.
+* Salário desconhecido → aparente menor risco, mas provavelmente relacionado à ausência de informação.
+
+---
+
+## 5. Risco Relativo
+
+* **Idade jovem**: 5x maior risco que idosos.
+* **Imobiliário**: 2x maior risco que “outros”.
+* **Endividamento alto**: +63% de risco vs. baixo/médio.
+* **Salário desconhecido**: risco menor aparente, mas viés de informação.
+
+---
+
+## 6. Classificação por Score
+
+Foram testados diferentes pontos de corte (2 a 6).
+
+| Corte | Acurácia | Precisão | Recall | F1-Score |
+| ----- | -------- | -------- | ------ | -------- |
+| 2     | 65,8%    | 2,4%     | 42%    | 4,5%     |
+| 3     | 91,1%    | 3,9%     | 16%    | 6,2%     |
+| 4     | 96,6%    | 3,9%     | 3%     | 3,6%     |
+| 5     | 98,1%    | 12,5%    | 0%     | 0,3%     |
+
+**Escolha recomendada:** Corte 3 → melhor equilíbrio entre acurácia (91%) e recall (16%).
+
+---
+
+## 7. Dashboard
+
+Construído no **Looker Studio** com:
+
+* **Scorecards gerais**: total de clientes, % inadimplentes, % bons pagadores, média de idade, média salarial.
+* Gráficos de inadimplência por faixa etária, tipo de empréstimo, salário e endividamento.
+* Tabela de cortes do score.
+* Matriz de confusão.
+* Filtros interativos por segmento.
+
+---
+
+## 8. Conclusões e Recomendações
+
+1. **Estratégia de crédito**: adotar corte 3 como política padrão. Para segmentos com maior risco (ex.: jovens, imobiliário), adotar postura **mais conservadora** (limites iniciais menores, maior análise manual). Para clientes de baixo risco, é possível adotar uma abordagem **mais agressiva** (aprovações automáticas).
+2. **Otimização operacional**:
+
+   * Aprovação automática para clientes de baixo risco.
+   * Políticas específicas para jovens e crédito imobiliário.
+3. **Melhoria contínua**:
+
+   * Ampliar coleta de dados de renda (20% da base sem informação).
+   * Monitorar e retreinar o modelo a cada 6 meses.
+
+---
+
+## 9. Estrutura do Repositório
+
+```
+sql/          # Scripts SQL de ETL, modelagem e score
+notebooks/    # (opcional) Regressão logística em Python
+dashboard/    # Capturas do painel no Looker Studio
+docs/         # Ficha técnica e documentação
+presentation/ # Apresentação executiva
+```
+
+---
+
+## 10. Próximos Passos
+
+* Aplicar regressão logística para melhorar recall.
+* Monitorar métricas do score em produção.
+* Expandir variáveis disponíveis para enriquecer o modelo:
+
+  * Histórico de relacionamento com o banco (tempo de cliente, produtos contratados).
+  * Variáveis comportamentais (frequência de atrasos, uso de crédito rotativo).
+  * Dados socioeconômicos adicionais (região, ocupação, escolaridade).
+  * Variáveis externas (indicadores macroeconômicos, mercado de crédito).
+
 
 ### Entregáveis Finais
 
@@ -47,4 +162,5 @@ O projeto foi conduzido em etapas bem definidas, que combinam técnicas de engen
 ---
 
 Este projeto representa não só uma solução técnica, mas uma forma de pensar dados como ferramenta estratégica. Se quiser ver mais detalhes ou discutir como aplicar algo parecido em outro contexto, estou aberta a conversas.
+
 
