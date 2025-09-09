@@ -117,7 +117,9 @@ Construído no **Looker Studio** com:
 
 ## 8. Conclusões e Recomendações
 
-1. **Estratégia de crédito**: adotar corte 3 como política padrão. Para segmentos com maior risco (ex.: jovens, imobiliário), adotar postura **mais conservadora** (limites iniciais menores, maior análise manual). Para clientes de baixo risco, é possível adotar uma abordagem **mais agressiva** (aprovações automáticas).
+1. **Estratégia de crédito**: adotar corte 3 como política padrão. 
+   Para segmentos com maior risco (ex.: jovens, imobiliário, maior comprometimento da renda), adotar postura **mais conservadora** (limites iniciais menores, maior análise manual). 
+   
 2. **Otimização operacional**:
 
    * Aprovação automática para clientes de baixo risco.
@@ -162,5 +164,6 @@ presentation/ # Apresentação executiva
 ---
 
 Este projeto representa não só uma solução técnica, mas uma forma de pensar dados como ferramenta estratégica. Se quiser ver mais detalhes ou discutir como aplicar algo parecido em outro contexto, estou aberta a conversas.
+
 
 
