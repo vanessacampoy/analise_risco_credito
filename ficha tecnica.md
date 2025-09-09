@@ -135,12 +135,10 @@ Construído no **Looker Studio** com:
 
 ```
 sql/          # Scripts SQL de ETL, modelagem e score
-notebooks/    # (opcional) Regressão logística em Python
 dashboard/    # Capturas do painel no Looker Studio
 docs/         # Ficha técnica e documentação
-presentation/ # Apresentação executiva
+apresentacao/ # Apresentação
 ```
-
 ---
 
 ## 10. Próximos Passos
@@ -163,7 +161,7 @@ presentation/ # Apresentação executiva
 
 ---
 
-Este projeto representa não só uma solução técnica, mas uma forma de pensar dados como ferramenta estratégica. Se quiser ver mais detalhes ou discutir como aplicar algo parecido em outro contexto, estou aberta a conversas.
+
 
 
 
